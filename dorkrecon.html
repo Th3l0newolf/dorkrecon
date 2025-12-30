@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dork Recon | Security Intelligence</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --accent: #10b981;
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .glow-button {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glow-button:hover {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .input-focus:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .category-badge {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="border-b border-white/10 py-4 px-6 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-2 rounded-lg shadow-lg shadow-blue-500/20">
+                    <i class="fas fa-shield-halved text-white text-xl"></i>
+                </div>
+                <span class="text-xl font-bold tracking-tight text-white uppercase mono">Dork<span class="text-blue-500">Recon</span></span>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#" onclick="toggleAbout()" class="text-slate-400 hover:text-white transition-colors text-sm font-medium">About Tool</a>
+                <div class="flex items-center gap-4 border-l border-white/10 pl-8">
+                    <a href="https://github.com" target="_blank" class="text-slate-400 hover:text-white text-lg transition-transform hover:scale-110"><i class="fab fa-github"></i></a>
+                    <a href="https://twitter.com" target="_blank" class="text-slate-400 hover:text-white text-lg transition-transform hover:scale-110"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow container mx-auto px-4 py-12 max-w-4xl">
+        
+        <!-- About Section -->
+        <div id="about-card" class="hidden glass-card rounded-2xl p-8 mb-10 border-l-4 border-l-blue-500 animate-in fade-in duration-300">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h2 class="text-2xl font-bold mb-3 text-white">Security Intelligence Assistant</h2>
+                    <p class="text-slate-400 leading-relaxed max-w-2xl">
+                        Dork Recon simplifies advanced OSINT (Open Source Intelligence) workflows. By automating Google Dork queries, 
+                        researchers can quickly identify misconfigured servers, exposed sensitive files, and potential attack vectors 
+                        within a specific domain. Use this tool for authorized security audits only.
+                    </p>
+                </div>
+                <button onclick="toggleAbout()" class="text-slate-500 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+        </div>
+
+        <!-- Main Search Form -->
+        <div class="glass-card rounded-3xl p-8 md:p-12">
+            <header class="text-center mb-10">
+                <h1 class="text-4xl font-extrabold text-white mb-2 tracking-tight">Vulnerability Scout</h1>
+                <p class="text-slate-400">Target a domain to discover hidden infrastructure and data leaks.</p>
+            </header>
+
+            <form onsubmit="handleSubmit(event)" class="space-y-6">
+                <!-- Domain Input -->
+                <div class="space-y-2">
+                    <label for="domain" class="text-sm font-bold text-slate-300 uppercase tracking-wider ml-1">Target Domain</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fas fa-globe text-slate-500 group-focus-within:text-blue-500 transition-colors"></i>
+                        </div>
+                        <input type="text" id="domain" required 
+                            class="w-full bg-slate-900/50 border border-slate-700 text-white rounded-xl py-4 pl-12 pr-4 input-focus transition-all mono placeholder:text-slate-600" 
+                            placeholder="example.com">
+                    </div>
+                </div>
+
+                <!-- Dork Selection -->
+                <div class="space-y-2">
+                    <label for="dork" class="text-sm font-bold text-slate-300 uppercase tracking-wider ml-1">Recon Method</label>
+                    <div class="relative">
+                        <select id="dork" required 
+                            class="w-full bg-slate-900/50 border border-slate-700 text-white rounded-xl py-4 px-4 appearance-none input-focus transition-all cursor-pointer">
+                            <optgroup label="Exploits & RCE">
+                                <option value="site:domain.com ext:action">Apache STRUTS RCE (1)</option>
+                                <option value="site:domain.com ext:struts">Apache STRUTS RCE (2)</option>
+                                <option value="site:domain.com ext:do">Apache STRUTS RCE (3)</option>
+                            </optgroup>
+                            <optgroup label="File Discovery">
+                                <option value="site:domain.com intitle:index.of">Directory listings</option>
+                                <option value="site:domain.com ext:bkf | ext:bkp | ext:bak | ext:old | ext:backup">Backup and Old files</option>
+                                <option value="site:domain.com ext:doc | ext:docx | ext:odt | ext:rtf | ext:sxw | ext:psw | ext:ppt | ext:pptx | ext:pps | ext:csv">Publicly exposed documents</option>
+                                <option value="site:domain.com ext:log">Logfiles exposed</option>
+                                <option value="site:domain.com ext:sql | ext:dbf | ext:mdb">Database files exposed</option>
+                            </optgroup>
+                            <optgroup label="System Info">
+                                <option value="site:domain.com ext:php intitle:phpinfo &quot;published by the PHP Group&quot;">PHP info</option>
+                                <option value="site:domain.com intext:&quot;sql syntax near&quot; | intext:&quot;syntax error has occurred&quot; | intext:&quot;incorrect syntax near&quot; | intext:&quot;unexpected end of SQL command&quot; | intext:&quot;Warning: mysql_connect()&quot; | intext:&quot;Warning: mysql_query()&quot; | intext:&quot;Warning: pg_connect()&quot;">SQL errors</option>
+                                <option value="domain.com/robots.txt">Robots.txt Analysis</option>
+                                <option value="site:domain.com inurl:&quot;/phpinfo.php&quot; | inurl:&quot;.htaccess&quot;">.htaccess & Critical Files</option>
+                            </optgroup>
+                            <optgroup label="Authentication & Access">
+                                <option value="site:domain.com inurl:admin">Admin panels</option>
+                                <option value="site:domain.com inurl:login | inurl:signin | intitle:Login | intitle:&quot;sign in&quot; | inurl:auth">Login pages</option>
+                                <option value="inurl:&quot;/.git &quot;domain.com -github">.git folder leaks</option>
+                                <option value="site:domain.com inurl:wp-content | inurl:wp-includes">WordPress Infrastructure</option>
+                            </optgroup>
+                            <optgroup label="Third Party & Clouds">
+                                <option value="site:github.com | site:gitlab.com &quot;domain.com&quot;">Source Code (GitHub/GitLab)</option>
+                                <option value="site:stackoverflow.com &quot;domain.com&quot;">StackOverflow Mentions</option>
+                                <option value="site:s3.amazonaws.com domain">AWS S3 Buckets (Name)</option>
+                                <option value="site:digitaloceanspaces.com &quot;domain.com&quot;">Digital Ocean Spaces</option>
+                                <option value="site:linkedin.com employees domain.com">LinkedIn Employee Dork</option>
+                                <option value="site:atlassian.net | site:bitbucket.org &quot;domain.com&quot;">Atlassian / BitBucket</option>
+                            </optgroup>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-500">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl flex justify-center items-center gap-3 glow-button uppercase tracking-widest text-sm">
+                    <i class="fas fa-search-plus"></i> Launch Recon
+                </button>
+            </form>
+        </div>
+
+        <!-- Feature Grid -->
+        <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass-card p-6 rounded-2xl hover:border-blue-500/50 transition-colors group">
+                <div class="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-500/20 transition-colors">
+                    <i class="fas fa-microchip text-blue-500"></i>
+                </div>
+                <h3 class="font-bold text-white mb-2">Passive Recon</h3>
+                <p class="text-sm text-slate-400">Discover subdomains and assets without direct interaction with target servers.</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl hover:border-emerald-500/50 transition-colors group">
+                <div class="w-12 h-12 bg-emerald-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-emerald-500/20 transition-colors">
+                    <i class="fas fa-file-shield text-emerald-500"></i>
+                </div>
+                <h3 class="font-bold text-white mb-2">Leak Detection</h3>
+                <p class="text-sm text-slate-400">Identify backup files and log data that should never be public-facing.</p>
+            </div>
+            <div class="glass-card p-6 rounded-2xl hover:border-amber-500/50 transition-colors group">
+                <div class="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-amber-500/20 transition-colors">
+                    <i class="fas fa-bolt text-amber-500"></i>
+                </div>
+                <h3 class="font-bold text-white mb-2">Instant Results</h3>
+                <p class="text-sm text-slate-400">Zero-latency query generation with immediate redirection to Google Results.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="mt-auto border-t border-white/5 py-8 px-6 bg-slate-950/50">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-slate-500 text-sm">
+                &copy; 2024 <span class="mono text-slate-300">DorkRecon v2.0</span>. Built for Cybersecurity Professionals.
+            </div>
+            <div class="flex gap-6 text-sm">
+                <a href="#" class="text-slate-500 hover:text-white transition-colors">Terms</a>
+                <a href="#" class="text-slate-500 hover:text-white transition-colors">Privacy</a>
+                <a href="#" class="text-slate-500 hover:text-white transition-colors">Disclaimer</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function handleSubmit(event) {
+            event.preventDefault();
+            const domainInput = document.getElementById('domain');
+            const dorkSelect = document.getElementById('dork');
+            
+            let domain = domainInput.value.trim();
+            // Basic cleanup for domain
+            domain = domain.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").split('/')[0];
+            
+            const dork = dorkSelect.value;
+            const query = dork.replace(/domain\.com/g, domain);
+            
+            const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            
+            // Visual feedback
+            const btn = event.submitter;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initializing...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                window.open(searchUrl, '_blank');
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            }, 600);
+        }
+
+        function toggleAbout() {
+            const aboutCard = document.getElementById('about-card');
+            aboutCard.classList.toggle('hidden');
+            if (!aboutCard.classList.contains('hidden')) {
+                aboutCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+    </script>
+</body>
+</html>
